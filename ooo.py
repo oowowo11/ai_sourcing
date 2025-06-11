@@ -204,6 +204,7 @@ def main():
                         file_name=fname,
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
+                st.info("🗂️ 다운로드가 완료되었습니다.")
 
 #       # 7) 완료 메시지
 #        st.success("모든 작업 완료! 아래에서 결과 파일을 확인하세요:")
