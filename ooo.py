@@ -138,23 +138,61 @@ def save_links_to_excel(links, batch_idx, category, market, template):
 def main():
     st.title("마켓 소싱 자동화 프로그램 (웹버전)")
 
+    # 1) 사용자 입력
     market = st.selectbox("마켓 선택", ["타오바오", "라쿠텐"])
     category = st.text_input("카테고리 입력 (예: 여름 여성 의류)")
-    target = st.text_input("타깃(대상) 입력 (예: 20~40대 여성)")
-    num_keywords = st.number_input("카테고리당 생성할 키워드 개수", min_value=1, max_value=20, value=3)
-    num_links = st.number_input("한 키워드당 크롤링할 링크 개수", min_value=1, max_value=20, value=10)
+    target   = st.text_input("타깃(대상) 입력 (예: 20~40대 여성)")
+    num_keywords = st.number_input(
+        "카테고리당 생성할 키워드 개수", min_value=1, max_value=20, value=3
+    )
+    num_links = st.number_input(
+        "한 키워드당 크롤링할 링크 개수", min_value=1, max_value=20, value=10
+    )
 
-    run = st.button("실행")
+    # 2) 실행 버튼
+    if st.button("실행"):
+        # 입력 검증
+        if not category or not target:
+            st.error("❗️ 카테고리와 타깃을 모두 입력하세요.")
+            return
 
-    if run:
-    
-        # 입력 검사 …
+        # 3) 키워드 생성
         kws = generate_keywords(category, target, num_keywords, market)
-        # …
-        all_links=[]; batch=1; files=[]
+        if not kws:
+            st.error("❗️ 키워드 생성에 실패했습니다.")
+            return
+
+        st.success(f"추천 키워드 쌍: {kws}")
+
+        # 4) 크롤링 및 파일 저장 준비
+        template = taobao_template if market == "타오바오" else rakuten_template
+        all_links = []
+        batch_idx = 1
+        filenames = []
+
+        # 5) 키워드별 크롤링
         for ko, keyword in kws:
             st.write(f"🔍 {keyword} 크롤링 중…")
             links = crawl_links_http(keyword, num_links, market)
+            all_links.extend(links)
+
+            # 50개 단위로 엑셀 저장
+            while len(all_links) >= 50:
+                fname = save_links_to_excel(
+                    all_links[:50], batch_idx, category, market, template
+                )
+                filenames.append(fname)
+                all_links = all_links[50:]
+                batch_idx += 1
+
+        # 6) 남은 링크도 저장
+        if all_links:
+            fname = save_links_to_excel(
+                all_links, batch_idx, category, market, template
+            )
+            filenames.append(fname)
+
+        # 7) 완료 메시지
         st.success("모든 작업 완료! 아래에서 결과 파일을 확인하세요:")
         for fname in filenames:
             if os.path.exists(fname):
@@ -162,3 +200,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
