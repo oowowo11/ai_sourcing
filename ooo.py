@@ -3,6 +3,7 @@ import streamlit as st
 import openai
 import requests
 import io
+import zipfile
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -205,21 +206,22 @@ def main():
         st.write("🔖 파일 목록(filenames):", filenames)
     
         if filenames:
-            st.success("✅ 모든 작업 완료! 아래 버튼을 클릭해 파일을 다운로드하세요.")
-            for fname in filenames:
-                # 파일 존재 여부 체크
-                if os.path.exists(fname):
-                    # ← 반드시 이 줄보다 네 칸 더 들여쓰기
-                    with open(fname, "rb") as f:
-                        data = f.read()
-                    # ← 그리고 이 줄도 with 블록과 동일한 네 칸 들여쓰기
-                    st.download_button(
-                        label=f"📥 {fname} 다운로드",
-                        data=data,
-                        file_name=fname,
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            # 메모리 버퍼에 ZIP 만들기
+            buf = io.BytesIO()
+            with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+                for fname in filenames:
+                    # 로컬에 저장된 엑셀 파일 읽어서 ZIP에 추가
+                    z.write(fname, arcname=os.path.basename(fname))
+            buf.seek(0)  # 버퍼 위치를 처음으로 돌려놓기
+        
+            # 한 번의 다운로드 버튼으로 ZIP 전체를 내려받기
+            st.download_button(
+                label="📥 모든 파일 ZIP으로 다운로드",
+                data=buf,
+                file_name="sourcing_results.zip",
+                mime="application/zip"
             )
-            st.info("🗂️ 다운로드가 완료되었습니다.")
+            st.info("🗂️ ZIP 다운로드 준비 완료!")
 
 #       # 7) 완료 메시지
 #        st.success("모든 작업 완료! 아래에서 결과 파일을 확인하세요:")
