@@ -63,16 +63,16 @@ def generate_keywords(category, target, n, market):
             "Return each pair as (Korean, Japanese) on separate lines."
         )
 
-    res = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user",   "content": prompt}
-        ],
-        max_tokens=300,
-        temperature=0.7,
-    )
-    text = res.choices[0].message.content.strip()
+        res = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": prompt}
+            ],
+            max_tokens=300,
+            temperature=0.7,
+        )
+        text = res.choices[0].message.content.strip()
     except Exception as e:
         st.error(f"OpenAI 키 또는 네트워크 오류: {e}")
         return []
