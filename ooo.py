@@ -72,10 +72,10 @@ def generate_keywords(category, target, n, market):
             temperature=0.7,
         )
         text = res.choices[0].message.content.strip()
-except Exception as e:
-    st.error("❗️ OpenAI 호출 중 오류가 발생했습니다.")
-    st.write("🔍 상세 오류 메시지:", e)
-    return []
+    except Exception as e:
+        st.error("❗️ OpenAI 호출 중 오류가 발생했습니다.")
+        st.write("🔍 상세 오류 메시지:", e)
+        return []
 
     # ── 여기부터는 정상 response 처리 로직 ──
     pairs = []
