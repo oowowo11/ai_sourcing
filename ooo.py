@@ -1,7 +1,4 @@
 import os
-os.environ["PYTHONIOENCODING"] = "utf-8"
-os.environ["LC_ALL"] = "en_US.UTF-8"
-os.environ["LANG"] = "en_US.UTF-8"
 import streamlit as st
 import openai
 from selenium import webdriver
@@ -14,11 +11,11 @@ from datetime import datetime
 import os
 
 # 1. 본인 OpenAI 키로 수정
-client = openai.OpenAI(api_key="여기에_본인_API_KEY_입력")
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
 # 2. 엑셀 템플릿 파일명 (필요에 따라 경로 수정)
 taobao_template = "123.xlsx"
-rakuten_template = "퍼센티_다양한_카테고리_엑셀_수집(쿠팡_기준).xlsx"
+rakuten_template = "123.xlsx"
 
 def setup_driver(lang):
     options = Options()
@@ -65,21 +62,20 @@ def generate_keywords(category, target, n, market):
 
     # ── 반드시 try: 블록으로 감싸야 except가 동작합니다 ──
     try:
-        res = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user",   "content": prompt}
-            ],
-            max_tokens=300,
-            temperature=0.7,
-        )
-        text = res.choices[0].message.content.strip()
-    except Exception as e:
-        # 한글 안내와 예외 메시지 분리 출력
-        st.error("❗️ OpenAI 호출 중 오류가 발생했습니다.")
-        st.write("🔍 상세 오류 메시지:", e)
-        return []
+    res = openai.ChatCompletion.create(
+        model="gpt-4o",
+        messages=[
+            {"role":"system", "content": system},
+            {"role":"user",   "content": prompt}
+        ],
+        max_tokens=300,
+        temperature=0.7,
+    )
+    text = res.choices[0].message.content.strip()
+except Exception as e:
+    st.error("❗️ OpenAI 호출 중 오류가 발생했습니다.")
+    st.write("🔍 상세 오류 메시지:", e)
+    return []
 
     # ── 여기부터는 정상 response 처리 로직 ──
     pairs = []
