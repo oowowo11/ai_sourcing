@@ -2,6 +2,7 @@ import os
 import streamlit as st
 import openai
 import requests
+import io
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -10,7 +11,6 @@ import openpyxl
 import urllib.parse
 import time
 from datetime import datetime
-import os
 
 # 1) OpenAI 키
 API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -191,6 +191,19 @@ def main():
                 all_links, batch_idx, category, market, template
             )
             filenames.append(fname)
+
+        if filenames:
+            st.success("모든 작업 완료! 아래 링크를 클릭해 파일을 다운로드할 수 있습니다.")
+            for fname in filenames:
+                if os.path.exists(fname):
+                    with open(fname, "rb") as f:
+                        data = f.read()
+                    st.download_button(
+                        label=f"📥 {fname} 다운로드",
+                        data=data,
+                        file_name=fname,
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
 
         # 7) 완료 메시지
         st.success("모든 작업 완료! 아래에서 결과 파일을 확인하세요:")
