@@ -63,6 +63,8 @@ def generate_keywords(category, target, n, market):
             "Return each pair as (Korean, Japanese) on separate lines."
         )
 
+    # ── 반드시 try: 블록으로 감싸야 except가 동작합니다 ──
+    try:
         res = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -74,17 +76,21 @@ def generate_keywords(category, target, n, market):
         )
         text = res.choices[0].message.content.strip()
     except Exception as e:
-        st.error(f"OpenAI 키 또는 네트워크 오류: {e}")
+        # 한글 안내와 예외 메시지 분리 출력
+        st.error("❗️ OpenAI 호출 중 오류가 발생했습니다.")
+        st.write("🔍 상세 오류 메시지:", e)
         return []
+
+    # ── 여기부터는 정상 response 처리 로직 ──
     pairs = []
     for line in text.splitlines():
         if market == "타오바오" and "–" in line:
             ko, zh = [s.strip() for s in line.split("–", 1)]
             pairs.append((ko, zh))
         elif market == "라쿠텐" and "," in line:
-            ko, ja = [x.strip(" ()") for x in line.split(",")]
+            ko, ja = [x.strip(" ()") for x in line.split(",", 1)]
             pairs.append((ko, ja))
-    return pairs[:num_keywords]
+    return pairs[:n]
 
 def crawl_links(driver, keyword, num_links, market):
     if market == "타오바오":
