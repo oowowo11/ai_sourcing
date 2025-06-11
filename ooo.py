@@ -193,7 +193,7 @@ def main():
             filenames.append(fname)
 
         if filenames:
-            st.success("모든 작업 완료! 아래 링크를 클릭해 파일을 다운로드할 수 있습니다.")
+            st.success("✅ 모든 작업 완료! 아래 버튼을 클릭해 파일을 다운로드하세요.")
             for fname in filenames:
                 if os.path.exists(fname):
                     with open(fname, "rb") as f:
@@ -205,11 +205,11 @@ def main():
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
 
-        # 7) 완료 메시지
-        st.success("모든 작업 완료! 아래에서 결과 파일을 확인하세요:")
-        for fname in filenames:
-            if os.path.exists(fname):
-                st.write(f"📁 {fname}")
+#       # 7) 완료 메시지
+#        st.success("모든 작업 완료! 아래에서 결과 파일을 확인하세요:")
+#        for fname in filenames:
+#            if os.path.exists(fname):
+#                st.write(f"📁 {fname}")
 
 if __name__ == "__main__":
     main()
