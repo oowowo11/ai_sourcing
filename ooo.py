@@ -46,37 +46,33 @@ def setup_driver(lang):
     })
     return driver
 
-def generate_keywords(category, target, num_keywords, market):
+def generate_keywords(category, target, n, market):
     if market == "타오바오":
+        system = "You are an expert in Chinese cross-border e-commerce trend analysis. Please always respond in Korean."
         prompt = (
-            f"{target}를 대상으로 하는 {category} 카테고리에서 "
-            f"최근 트렌디하고 인기 있는 프리미엄 상품 {num_keywords}가지를 추천해 주세요. "
-            f"상품명은 한국어와 중국어로 각각 제공해 주시고, "
-            f"중국어는 타오바오에서 자연스러운 용어로 작성해 주세요.\n"
-            f"유명 브랜드나 상표명, 이미 추천된 상품은 포함하지 마세요.\n"
-            f"아래 형식으로 답변해 주세요:\n"
-            f"<한국어 상품명> – <중국어 상품명>\n"
+            f"Recommend {n} trending premium products in the category '{category}' "
+            f"for the target audience '{target}'. "
+            "Provide each product name in Korean and in natural Chinese (Taobao-style) in the format:\n"
+            "<Korean> – <Chinese>"
         )
-        system_msg = "당신은 중국 크로스보더 이커머스 트렌드 상품 전문가입니다."
     else:
+        system = "You are an expert in Japanese e-commerce fashion trends. Please always respond in Korean."
         prompt = (
-            f"일본 라쿠텐 Brand Avenue에서 인기 있는 상품 키워드 {num_keywords}쌍을 추천해 주세요.\n"
-            f"- (한국어, 일본어) 쌍으로 한 줄에 하나씩, 총 {num_keywords}줄로 써 주세요.\n"
-            f"카테고리는 {category}, 타깃은 {target}입니다.\n"
-            f"예시: (서머 드레스, サマードレス)"
+            f"Recommend {n} popular product keywords for Rakuten Brand Avenue "
+            f"in the category '{category}' and target '{target}'. "
+            "Return each pair as (Korean, Japanese) on separate lines."
         )
-        system_msg = "당신은 일본 패션, 라이프스타일 이커머스 트렌드에 능통한 전문가입니다."
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": system_msg},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=300,
-            temperature=0.7,
-        )
-        text = response.choices[0].message.content.strip()
+
+    res = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user",   "content": prompt}
+        ],
+        max_tokens=300,
+        temperature=0.7,
+    )
+    text = res.choices[0].message.content.strip()
     except Exception as e:
         st.error(f"OpenAI 키 또는 네트워크 오류: {e}")
         return []
