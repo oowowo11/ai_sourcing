@@ -143,9 +143,7 @@ def main():
     target = st.text_input("타깃(대상) 입력 (예: 20~40대 여성)")
     num_keywords = st.number_input("카테고리당 생성할 키워드 개수", min_value=1, max_value=20, value=3)
     num_links = st.number_input("한 키워드당 크롤링할 링크 개수", min_value=1, max_value=20, value=10)
-    run = st.button("실행")
-
-    if st.button("실행"):
+    
         # 입력 검사 …
         kws = generate_keywords(...)
         # …
