@@ -153,13 +153,13 @@ def main():
     if st.button("실행"):
         # 입력 검증
         if not category or not target:
-            st.error("❗️ 카테고리와 타깃을 모두 입력하세요.")
+            st.error("❗️ 카테고리와 타깃을 모두 입력하세요.");
             return
 
         # 3) 키워드 생성
         kws = generate_keywords(category, target, num_keywords, market)
         if not kws:
-            st.error("❗️ 키워드 생성에 실패했습니다.")
+            st.error("❗️ 키워드 생성에 실패했습니다.");
             return
 
         st.success(f"추천 키워드 쌍: {kws}")
@@ -195,16 +195,15 @@ def main():
         if filenames:
             st.success("✅ 모든 작업 완료! 아래 버튼을 클릭해 파일을 다운로드하세요.")
             for fname in filenames:
-                if os.path.exists(fname):
-                    with open(fname, "rb") as f:
-                        data = f.read()
-                    st.download_button(
-                        label=f"📥 {fname} 다운로드",
-                        data=data,
-                        file_name=fname,
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-                st.info("🗂️ 다운로드가 완료되었습니다.")
+                with open(fname, "rb") as f:
+                    data = f.read()
+                st.download_button(
+                    label=f"📥 {fname} 다운로드",
+                    data=data,
+                    file_name=fname,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            st.info("🗂️ 다운로드가 완료되었습니다.")
 
 #       # 7) 완료 메시지
 #        st.success("모든 작업 완료! 아래에서 결과 파일을 확인하세요:")
