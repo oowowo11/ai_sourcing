@@ -164,6 +164,9 @@ def main():
 
         st.success(f"추천 키워드 쌍: {kws}")
 
+        # 크롤링 직전에 추가
+        st.write("🔖 테스트: 첫 키워드에서 가져온 링크 수:", len(crawl_links_http(kws[0][1], num_links, market)))
+
         # 4) 크롤링 및 파일 저장 준비
         template = taobao_template if market == "타오바오" else rakuten_template
         all_links = []
@@ -188,6 +191,9 @@ def main():
                 filenames.append(fname)
                 all_links = all_links[50:]
                 batch_idx += 1
+
+        # 크롤링 직전에 추가
+        st.write("🔖 테스트: 첫 키워드에서 가져온 링크 수:", len(crawl_links_http(kws[0][1], num_links, market)))
 
         # 6) 남은 링크도 저장
         if all_links:
