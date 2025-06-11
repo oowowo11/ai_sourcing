@@ -62,16 +62,16 @@ def generate_keywords(category, target, n, market):
 
     # ── 반드시 try: 블록으로 감싸야 except가 동작합니다 ──
     try:
-    res = openai.ChatCompletion.create(
-        model="gpt-4o",
-        messages=[
-            {"role":"system", "content": system},
-            {"role":"user",   "content": prompt}
-        ],
-        max_tokens=300,
-        temperature=0.7,
-    )
-    text = res.choices[0].message.content.strip()
+        res = openai.ChatCompletion.create(
+            model="gpt-4o",
+            messages=[
+                {"role":"system", "content": system},
+                {"role":"user",   "content": prompt}
+            ],
+            max_tokens=300,
+            temperature=0.7,
+        )
+        text = res.choices[0].message.content.strip()
 except Exception as e:
     st.error("❗️ OpenAI 호출 중 오류가 발생했습니다.")
     st.write("🔍 상세 오류 메시지:", e)
