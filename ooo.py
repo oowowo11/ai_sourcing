@@ -170,6 +170,10 @@ def main():
         batch_idx = 1
         filenames = []
 
+        # 크롤링 직전에 추가
+        st.write("🔖 테스트: 첫 키워드에서 가져온 링크 수:", len(crawl_links_http(kws[0][1], num_links, market)))
+
+
         # 5) 키워드별 크롤링
         for ko, keyword in kws:
             st.write(f"🔍 {keyword} 크롤링 중…")
