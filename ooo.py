@@ -191,12 +191,12 @@ def main():
                 all_links, batch_idx, category, market, template
             )
             filenames.append(fname)
-
+    
+        st.write("🔖 파일 목록(filenames):", filenames)
+    
         if filenames:
             st.success("✅ 모든 작업 완료! 아래 버튼을 클릭해 파일을 다운로드하세요.")
             for fname in filenames:
-                with open(fname, "rb") as f:
-                    data = f.read()
                 st.download_button(
                     label=f"📥 {fname} 다운로드",
                     data=data,
@@ -204,8 +204,6 @@ def main():
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
             st.info("🗂️ 다운로드가 완료되었습니다.")
-    st.write("🔖 파일 목록(filenames):", filenames)
-
 
 #       # 7) 완료 메시지
 #        st.success("모든 작업 완료! 아래에서 결과 파일을 확인하세요:")
