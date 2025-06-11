@@ -149,7 +149,7 @@ def main():
     if run:
     
         # 입력 검사 …
-        kws = generate_keywords(...)
+        kws = generate_keywords(category, target, num_keywords, market)
         # …
         all_links=[]; batch=1; files=[]
         for ko, keyword in kws:
