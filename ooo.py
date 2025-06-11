@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 import openai
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -11,7 +12,10 @@ from datetime import datetime
 import os
 
 # 1. 본인 OpenAI 키로 수정
-openai.api_key = os.environ["OPENAI_API_KEY"]
+API_KEY = os.environ.get("OPENAI_API_KEY")
+if not API_KEY:
+    st.error("OPENAI_API_KEY가 설정되지 않았습니다.")
+    st.stop()
 
 # 2. 엑셀 템플릿 파일명 (필요에 따라 경로 수정)
 taobao_template = "123.xlsx"
@@ -44,34 +48,42 @@ def setup_driver(lang):
     return driver
 
 def generate_keywords(category, target, n, market):
+    # system, prompt 구성은 그대로 둡니다.
     if market == "타오바오":
-        system = "You are an expert in Chinese cross-border e-commerce trend analysis. Please always respond in Korean."
+        system = "You are an expert in Chinese cross-border e-commerce trend analysis. Please respond in Korean."
         prompt = (
-            f"Recommend {n} trending premium products in the category '{category}' "
-            f"for the target audience '{target}'. "
-            "Provide each product name in Korean and in natural Chinese (Taobao-style) in the format:\n"
-            "<Korean> – <Chinese>"
+            f"Recommend {n} trending premium products in category '{category}' "
+            f"for audience '{target}'. "
+            "Provide each item as <Korean> – <Chinese>."
         )
     else:
-        system = "You are an expert in Japanese e-commerce fashion trends. Please always respond in Korean."
+        system = "You are an expert in Japanese e-commerce fashion trends. Please respond in Korean."
         prompt = (
             f"Recommend {n} popular product keywords for Rakuten Brand Avenue "
-            f"in the category '{category}' and target '{target}'. "
-            "Return each pair as (Korean, Japanese) on separate lines."
+            f"in category '{category}', target '{target}'. "
+            "Return each as (Korean, Japanese) lines."
         )
 
-    # ── 반드시 try: 블록으로 감싸야 except가 동작합니다 ──
+    url = "https://api.openai.com/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": "gpt-4o",
+        "messages": [
+            {"role":"system", "content": system},
+            {"role":"user",   "content": prompt}
+        ],
+        "max_tokens": 300,
+        "temperature": 0.7
+    }
+
     try:
-        res = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=[
-                {"role":"system", "content": system},
-                {"role":"user",   "content": prompt}
-            ],
-            max_tokens=300,
-            temperature=0.7,
-        )
-        text = res.choices[0].message.content.strip()
+        r = requests.post(url, headers=headers, json=data, timeout=60)
+        r.raise_for_status()
+        resp = r.json()
+        text = resp["choices"][0]["message"]["content"].strip()
     except Exception as e:
         st.error("❗️ OpenAI 호출 중 오류가 발생했습니다.")
         st.write("🔍 상세 오류 메시지:", e)
@@ -80,11 +92,11 @@ def generate_keywords(category, target, n, market):
     # ── 여기부터는 정상 response 처리 로직 ──
     pairs = []
     for line in text.splitlines():
-        if market == "타오바오" and "–" in line:
-            ko, zh = [s.strip() for s in line.split("–", 1)]
+        if market=="타오바오" and "–" in line:
+            ko, zh = [s.strip() for s in line.split("–",1)]
             pairs.append((ko, zh))
-        elif market == "라쿠텐" and "," in line:
-            ko, ja = [x.strip(" ()") for x in line.split(",", 1)]
+        elif market=="라쿠텐" and "," in line:
+            ko, ja = [x.strip(" ()") for x in line.split(",",1)]
             pairs.append((ko, ja))
     return pairs[:n]
 
