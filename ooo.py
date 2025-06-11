@@ -207,16 +207,17 @@ def main():
         if filenames:
             st.success("✅ 모든 작업 완료! 아래 버튼을 클릭해 파일을 다운로드하세요.")
             for fname in filenames:
+                # 파일 존재 여부 체크
                 if os.path.exists(fname):
-            # 파일을 바이너리로 읽어서 data 변수에 담기
-                with open(fname, "rb") as f:
-                    data = f.read()
-                # 그 데이터를 다운로드 버튼에 넘겨줌
-                st.download_button(
-                    label=f"📥 {fname} 다운로드",
-                    data=data,
-                    file_name=fname,
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    # ← 반드시 이 줄보다 네 칸 더 들여쓰기
+                    with open(fname, "rb") as f:
+                        data = f.read()
+                    # ← 그리고 이 줄도 with 블록과 동일한 네 칸 들여쓰기
+                    st.download_button(
+                        label=f"📥 {fname} 다운로드",
+                        data=data,
+                        file_name=fname,
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
             st.info("🗂️ 다운로드가 완료되었습니다.")
 
