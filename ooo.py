@@ -13,9 +13,9 @@ from datetime import datetime
 import os
 
 # 1) OpenAI 키
-openai.api_key = os.environ.get("OPENAI_API_KEY")
-if not openai.api_key:
-    st.error("OPENAI_API_KEY 설정 필요!")
+API_KEY = os.environ.get("OPENAI_API_KEY")
+if not API_KEY:
+    st.error("🔑 OPENAI_API_KEY가 설정되지 않았습니다. Streamlit Secrets에 등록해주세요.")
     st.stop()
 
 # 2. 엑셀 템플릿 파일명 (필요에 따라 경로 수정)
@@ -67,8 +67,8 @@ def generate_keywords(category, target, n, market):
 
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
     }
     data = {
         "model": "gpt-4o",
